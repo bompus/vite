@@ -39,7 +39,7 @@ export interface ConfigEnv {
   mode: string
 }
 
-export type UserConfigFn = (env: ConfigEnv) => UserConfig
+export type UserConfigFn = (env: ConfigEnv) => UserConfig | Promise<UserConfig>
 export type UserConfigExport = UserConfig | UserConfigFn
 
 /**
@@ -634,7 +634,9 @@ export async function loadConfigFromFile(
     }
 
     const config =
-      typeof userConfig === 'function' ? userConfig(configEnv) : userConfig
+      typeof userConfig === 'function'
+        ? await userConfig(configEnv)
+        : userConfig
     if (!isObject(config)) {
       throw new Error(`config must export or return an object.`)
     }
